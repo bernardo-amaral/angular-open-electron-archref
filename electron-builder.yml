@@ -1,0 +1,23 @@
+appId: com.bernardoamaral.app
+productName: Bernardo
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - dist-electron/**/*
+  - dist/open-pdv/browser/**/*
+  - package.json
+
+extraMetadata:
+  main: dist-electron/main.js
+
+win:
+  target: nsis
+  arch:
+    - x64
+  artifactName: ${productName}-setup-${version}.${ext}
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
