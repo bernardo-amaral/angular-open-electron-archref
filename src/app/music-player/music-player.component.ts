@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,15 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { Howl } from 'howler';
+
+declare global {
+  interface Window {
+    audioApi: {
+      toMediaUrl: (filePath: string) => string;
+    };
+  }
+}
 
 export interface Track {
   title: string;
@@ -48,7 +57,7 @@ type LayoutMode = 'grid' | 'list';
   templateUrl: './music-player.component.html',
   styleUrl: './music-player.component.scss',
 })
-export class MusicPlayerComponent {
+export class MusicPlayerComponent implements OnDestroy {
   // --- Biblioteca (resultado da varredura de D:/musicas) ---
   library: Artist[] = [
     {
@@ -140,6 +149,9 @@ export class MusicPlayerComponent {
   sortAscending = true;
 
   // --- Estado do player ---
+  private sound: Howl | null = null;
+  private progressInterval: ReturnType<typeof setInterval> | null = null;
+
   currentTrack: Track | null = null;
   isPlaying = false;
   currentTime = 0;
@@ -210,15 +222,65 @@ export class MusicPlayerComponent {
   }
 
   playTrack(track: Track): void {
+    this.stopProgressTracking();
+    this.sound?.unload();
+
     this.currentTrack = track;
     this.currentTime = 0;
-    this.isPlaying = true;
-    // Aqui entra a chamada real ao serviço de áudio (Electron/Node) usando track.path
+
+    const mediaUrl = window.audioApi.toMediaUrl(track.path);
+
+    this.sound = new Howl({
+      src: [mediaUrl],
+      html5: true,
+      volume: this.volume / 100,
+      onplay: () => {
+        this.isPlaying = true;
+        this.startProgressTracking();
+      },
+      onpause: () => {
+        this.isPlaying = false;
+        this.stopProgressTracking();
+      },
+      onstop: () => {
+        this.isPlaying = false;
+        this.stopProgressTracking();
+      },
+      onend: () => {
+        this.isPlaying = false;
+        this.stopProgressTracking();
+        this.next();
+      },
+      onloaderror: (_id, error) => {
+        console.error('Falha ao carregar a faixa:', track.path, error);
+      },
+      onplayerror: (_id, error) => {
+        console.error('Falha ao reproduzir a faixa:', track.path, error);
+      },
+    });
+
+    this.sound.play();
   }
 
   togglePlay(): void {
-    if (!this.currentTrack) return;
-    this.isPlaying = !this.isPlaying;
+    if (!this.sound) return;
+
+    if (this.isPlaying) {
+      this.sound.pause();
+    } else {
+      this.sound.play();
+    }
+  }
+
+  seekTo(seconds: number): void {
+    if (!this.sound) return;
+    this.sound.seek(seconds);
+    this.currentTime = seconds;
+  }
+
+  setVolume(value: number): void {
+    this.volume = value;
+    this.sound?.volume(value / 100);
   }
 
   toggleShuffle(): void {
@@ -252,11 +314,36 @@ export class MusicPlayerComponent {
     const tracks = this.currentAlbumTracks;
     if (!tracks.length || !this.currentTrack) return;
     const index = tracks.findIndex((t) => t.path === this.currentTrack!.path);
-    const nextIndex = index < tracks.length - 1 ? index + 1 : 0;
+    const nextIndex = this.shuffle
+      ? Math.floor(Math.random() * tracks.length)
+      : index < tracks.length - 1
+        ? index + 1
+        : 0;
     this.playTrack(tracks[nextIndex]);
   }
 
   isCurrentTrack(track: Track): boolean {
     return this.currentTrack?.path === track.path;
+  }
+
+  private startProgressTracking(): void {
+    this.stopProgressTracking();
+    this.progressInterval = setInterval(() => {
+      if (this.sound && this.isPlaying) {
+        this.currentTime = this.sound.seek() as number;
+      }
+    }, 500);
+  }
+
+  private stopProgressTracking(): void {
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+      this.progressInterval = null;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.stopProgressTracking();
+    this.sound?.unload();
   }
 }
