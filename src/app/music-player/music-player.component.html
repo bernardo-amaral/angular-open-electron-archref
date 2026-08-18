@@ -208,13 +208,16 @@
       <div class="progress-row">
         <span class="time">{{ currentTime | number: "2.0" }}</span>
         <mat-slider
-          class="progress-slider"
           min="0"
           [max]="currentTrack?.duration ?? 0"
           step="1"
           aria-label="Progressão"
         >
-          <input matSliderThumb [value]="currentTime" />
+          <input
+            matSliderThumb
+            [value]="currentTime"
+            (valueChange)="seekTo($event)"
+          />
         </mat-slider>
         <span class="time">{{
           currentTrack?.duration ?? 0 | number: "2.0"
@@ -237,7 +240,11 @@
         step="1"
         aria-label="Volume"
       >
-        <input matSliderThumb [value]="volume" />
+        <input
+          matSliderThumb
+          [value]="volume"
+          (valueChange)="setVolume($event)"
+        />
       </mat-slider>
     </div>
   </footer>
