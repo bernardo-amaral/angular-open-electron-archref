@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "open-pdv": {
+    "kiosk-music-player": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,10 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/open-pdv",
+            "outputPath": {
+              "base": "dist/kiosk-music-player",
+              "browser": ""
+            },
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -64,10 +67,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "open-pdv:build:production"
+              "buildTarget": "kiosk-music-player:build:production"
             },
             "development": {
-              "buildTarget": "open-pdv:build:development"
+              "buildTarget": "kiosk-music-player:build:development"
             }
           },
           "defaultConfiguration": "development"
