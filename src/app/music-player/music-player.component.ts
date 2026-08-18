@@ -41,6 +41,13 @@ export interface Artist {
 type LibraryView = 'artists' | 'albums' | 'tracks';
 type LayoutMode = 'grid' | 'list';
 
+declare global {
+  interface Window {
+    audioApi: { toMediaUrl: (filePath: string) => string };
+    libraryApi: { scan: () => Promise<Artist[]> };
+  }
+}
+
 @Component({
   selector: 'app-music-player',
   standalone: true,
@@ -58,88 +65,19 @@ type LayoutMode = 'grid' | 'list';
   styleUrl: './music-player.component.scss',
 })
 export class MusicPlayerComponent implements OnDestroy {
-  // --- Biblioteca (resultado da varredura de D:/musicas) ---
-  library: Artist[] = [
-    {
-      name: 'Wu-Tang Clan',
-      cover:
-        'https://s2-oglobo.glbimg.com/ur-lS-fAyjWPY2VYEvsricBcwHE=/0x0:705x527/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2023/Y/t/x4Zzo3SVC0RL8tz105Dg/wu-tang-clan.png',
-      albums: [
-        {
-          title: 'Enter the Wu-Tang (36 Chambers)',
-          cover:
-            'https://upload.wikimedia.org/wikipedia/pt/thumb/d/d1/Enter_the_Wu-Tang.jpg/250px-Enter_the_Wu-Tang.jpg',
-          tracks: [
-            {
-              title: 'C.R.E.A.M.',
-              duration: 246,
-              path: 'D:/musicas/Wu-Tang Clan/Enter the Wu-Tang (36 Chambers)/cream.mp3',
-              artist: 'Wu-Tang Clan',
-              album: 'Enter the Wu-Tang (36 Chambers)',
-              cover:
-                'https://upload.wikimedia.org/wikipedia/pt/thumb/d/d1/Enter_the_Wu-Tang.jpg/250px-Enter_the_Wu-Tang.jpg',
-            },
-            {
-              title: 'Method Man',
-              duration: 212,
-              path: 'D:/musicas/Wu-Tang Clan/Enter the Wu-Tang (36 Chambers)/method_man.mp3',
-              artist: 'Wu-Tang Clan',
-              album: 'Enter the Wu-Tang (36 Chambers)',
-              cover:
-                'https://upload.wikimedia.org/wikipedia/pt/thumb/d/d1/Enter_the_Wu-Tang.jpg/250px-Enter_the_Wu-Tang.jpg',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'Eminem',
-      cover:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYBEFDNttAFnoNjmgyQVcFm8F_GDMKy6GwPwgwsUOL-29NlNdEog5EvU6o&s=10',
-      albums: [
-        {
-          title: 'The Eminem Show',
-          cover:
-            'https://upload.wikimedia.org/wikipedia/pt/3/35/The_Eminem_Show.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original',
-          tracks: [
-            {
-              title: 'Without Me',
-              duration: 229,
-              path: 'D:/musicas/Eminem/The Eminem Show/01 Without Me.mp3',
-              artist: 'Eminem',
-              album: 'The Eminem Show',
-              cover:
-                'https://upload.wikimedia.org/wikipedia/pt/3/35/The_Eminem_Show.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'Naughty By Nature',
-      cover: 'https://miro.medium.com/v2/1*JcNdpXLnupuIKr4dyuPP6A.png',
-      albums: [
-        {
-          title: 'Naughty Naughty III',
-          cover:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFlmVpfkK6hirFmQ4wfuBxjNwUDnO4vvSpbK_DccEz4hHOETzsLu-diCZc&s=10',
-          tracks: [
-            {
-              title: 'Sleeping on ya kitten',
-              duration: 280,
-              path: 'D:/musicas/Naughty By Nature/Naughty Naughty III/01 Sleeping on ya kitten.mp3',
-              artist: 'Naughty By Nature',
-              album: 'Naughty Naughty III',
-              cover:
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFlmVpfkK6hirFmQ4wfuBxjNwUDnO4vvSpbK_DccEz4hHOETzsLu-diCZc&s=10',
-            },
-          ],
-        },
-      ],
-    },
-  ];
+  library: Artist[] = [];
+  isLoadingLibrary = true;
 
-  // --- Estado de navegação da biblioteca ---
+  async ngOnInit(): Promise<void> {
+    try {
+      this.library = await window.libraryApi.scan();
+    } catch (error) {
+      console.error('Falha ao carregar a biblioteca musical:', error);
+    } finally {
+      this.isLoadingLibrary = false;
+    }
+  }
+
   view: LibraryView = 'artists';
   selectedArtist: Artist | null = null;
   selectedAlbum: Album | null = null;
@@ -148,7 +86,6 @@ export class MusicPlayerComponent implements OnDestroy {
   searchTerm = '';
   sortAscending = true;
 
-  // --- Estado do player ---
   private sound: Howl | null = null;
   private progressInterval: ReturnType<typeof setInterval> | null = null;
 

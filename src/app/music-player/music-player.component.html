@@ -1,4 +1,18 @@
 <div class="app-shell">
+  <div class="window-chrome">
+    <button
+      mat-icon-button
+      aria-label="Voltar"
+      (click)="goBack()"
+      [disabled]="view === 'artists'"
+    >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button mat-icon-button aria-label="Avançar" disabled>
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+
   <div class="app-body">
     <aside class="sidebar">
       <mat-form-field appearance="outline" class="search-field">
@@ -31,20 +45,6 @@
     </aside>
 
     <main class="content">
-      <div class="window-chrome">
-        <button
-          mat-icon-button
-          aria-label="Voltar"
-          (click)="goBack()"
-          [disabled]="view === 'artists'"
-        >
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        <button mat-icon-button aria-label="Avançar" disabled>
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-      </div>
-
       <header class="content-header">
         <div class="title-block">
           <h1>{{ sectionTitle }}</h1>
@@ -76,70 +76,80 @@
         </div>
       </header>
 
-      <!-- Nível 1: Artistas -->
-      <div
-        class="grid-list"
-        *ngIf="view === 'artists'"
-        [class.list-mode]="layout === 'list'"
-      >
-        <button
-          matRipple
-          class="card artist-card"
-          *ngFor="let artist of filteredArtists"
-          type="button"
-          (click)="selectArtist(artist)"
-        >
-          <span class="cover round">
-            <img [src]="artist.cover" [alt]="artist.name" />
-          </span>
-          <span class="card-title">{{ artist.name }}</span>
-        </button>
-      </div>
+      <!-- Única área com scroll dentro do painel principal -->
+      <div class="content-scroll">
+        <div class="loading-state" *ngIf="isLoadingLibrary">
+          <mat-icon>hourglass_empty</mat-icon>
+          <p>Lendo biblioteca musical...</p>
+        </div>
 
-      <!-- Nível 2: Álbuns -->
-      <div
-        class="grid-list"
-        *ngIf="view === 'albums'"
-        [class.list-mode]="layout === 'list'"
-      >
-        <button
-          matRipple
-          class="card album-card"
-          *ngFor="let album of selectedArtist?.albums"
-          type="button"
-          (click)="selectAlbum(album)"
+        <!-- Nível 1: Artistas -->
+        <div
+          class="grid-list"
+          *ngIf="!isLoadingLibrary && view === 'artists'"
+          [class.list-mode]="layout === 'list'"
         >
-          <span class="cover square">
-            <img [src]="album.cover" [alt]="album.title" />
-          </span>
-          <span class="card-title">{{ album.title }}</span>
-          <span class="card-subtitle">{{ album.tracks.length }} música(s)</span>
-        </button>
-      </div>
+          <button
+            matRipple
+            class="card artist-card"
+            *ngFor="let artist of filteredArtists"
+            type="button"
+            (click)="selectArtist(artist)"
+          >
+            <span class="cover round">
+              <img [src]="artist.cover" [alt]="artist.name" />
+            </span>
+            <span class="card-title">{{ artist.name }}</span>
+          </button>
+        </div>
 
-      <!-- Nível 3: Músicas -->
-      <div class="track-list" *ngIf="view === 'tracks'">
-        <button
-          matRipple
-          class="track-row"
-          [class.active]="isCurrentTrack(track)"
-          *ngFor="let track of selectedAlbum?.tracks; let i = index"
-          type="button"
-          (click)="playTrack(track)"
+        <!-- Nível 2: Álbuns -->
+        <div
+          class="grid-list"
+          *ngIf="!isLoadingLibrary && view === 'albums'"
+          [class.list-mode]="layout === 'list'"
         >
-          <span class="track-index">
-            <mat-icon *ngIf="isCurrentTrack(track) && isPlaying"
-              >graphic_eq</mat-icon
+          <button
+            matRipple
+            class="card album-card"
+            *ngFor="let album of selectedArtist?.albums"
+            type="button"
+            (click)="selectAlbum(album)"
+          >
+            <span class="cover square">
+              <img [src]="album.cover" [alt]="album.title" />
+            </span>
+            <span class="card-title">{{ album.title }}</span>
+            <span class="card-subtitle"
+              >{{ album.tracks.length }} música(s)</span
             >
-            <ng-container *ngIf="!(isCurrentTrack(track) && isPlaying)">{{
-              i + 1
-            }}</ng-container>
-          </span>
-          <span class="track-title">{{ track.title }}</span>
-          <span class="track-duration">{{
-            track.duration | number: "2.0"
-          }}</span>
-        </button>
+          </button>
+        </div>
+
+        <!-- Nível 3: Músicas -->
+        <div class="track-list" *ngIf="!isLoadingLibrary && view === 'tracks'">
+          <button
+            matRipple
+            class="track-row"
+            [class.active]="isCurrentTrack(track)"
+            *ngFor="let track of selectedAlbum?.tracks; let i = index"
+            type="button"
+            (click)="playTrack(track)"
+          >
+            <span class="track-index">
+              <mat-icon *ngIf="isCurrentTrack(track) && isPlaying"
+                >graphic_eq</mat-icon
+              >
+              <ng-container *ngIf="!(isCurrentTrack(track) && isPlaying)">{{
+                i + 1
+              }}</ng-container>
+            </span>
+            <span class="track-title">{{ track.title }}</span>
+            <span class="track-duration">{{
+              track.duration | number: "2.0"
+            }}</span>
+          </button>
+        </div>
       </div>
     </main>
   </div>
@@ -208,6 +218,7 @@
       <div class="progress-row">
         <span class="time">{{ currentTime | number: "2.0" }}</span>
         <mat-slider
+          class="progress-slider"
           min="0"
           [max]="currentTrack?.duration ?? 0"
           step="1"
