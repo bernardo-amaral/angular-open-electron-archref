@@ -1,13 +1,18 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { MusicPlayerComponent } from './music-player/music-player.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  imports: [MusicPlayerComponent],
+  template: '<app-music-player></app-music-player>',
+  styles: [
+    `
+      :host {
+        display: block;
+        min-height: 100vh;
+      }
+    `,
+  ],
 })
-export class AppComponent {
-  title = 'open-pdv';
-}
+export class AppComponent {}

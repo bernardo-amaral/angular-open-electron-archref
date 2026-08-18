@@ -1,0 +1,85 @@
+<div class="player-shell">
+  <aside class="library-panel">
+    <div class="brand">
+      <span class="brand-mark">M</span>
+      <div>
+        <strong>Music Kiosk</strong>
+        <small>Player</small>
+      </div>
+    </div>
+
+    <div class="library-header">
+      <span>Playlist</span>
+      <button mat-icon-button aria-label="Adicionar música">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+
+    <div class="playlist">
+      <button
+        matRipple
+        class="playlist-item active"
+        *ngFor="let track of playlist; let i = index"
+        type="button"
+      >
+        <span class="track-index">{{ i + 1 }}</span>
+        <span class="track-name">{{ track }}</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="player-panel">
+    <mat-card class="now-playing-card">
+      <div class="cover-wrap">
+        <img [src]="currentTrack.cover" [alt]="currentTrack.title" />
+      </div>
+
+      <div class="meta">
+        <p class="eyebrow">Now playing</p>
+        <h1>{{ currentTrack.title }}</h1>
+        <h2>{{ currentTrack.artist }}</h2>
+        <p class="album">{{ currentTrack.album }}</p>
+      </div>
+
+      <div class="progress-block">
+        <div class="time-row">
+          <span>{{ currentTrack.currentTime | number: "2.0" }}</span>
+          <span>{{ currentTrack.duration | number: "2.0" }}</span>
+        </div>
+
+        <mat-slider min="0" max="246" step="1" aria-label="Progression">
+          <input matSliderThumb [value]="currentTrack.currentTime" />
+        </mat-slider>
+      </div>
+
+      <div class="controls">
+        <button
+          mat-fab
+          color="primary"
+          aria-label="Música anterior"
+          (click)="previous()"
+        >
+          <mat-icon>skip_previous</mat-icon>
+        </button>
+
+        <button
+          mat-fab
+          class="play-button"
+          aria-label="Reproduzir ou pausar"
+          (click)="togglePlay()"
+        >
+          <mat-icon>{{ isPlaying ? "pause" : "play_arrow" }}</mat-icon>
+        </button>
+
+        <button
+          mat-fab
+          color="primary"
+          aria-label="Próxima música"
+          (click)="next()"
+        >
+          <mat-icon>skip_next</mat-icon>
+        </button>
+      </div>
+    </mat-card>
+  </main>
+</div>

@@ -35,17 +35,23 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const path = __importStar(require("path"));
+const pkg = __importStar(require("../package.json"));
 let mainWindow = null;
 function createWindow() {
+    const version = pkg.version || '0.0.0';
+    const appTitle = `NightShade's Music Player - ${version}`;
     mainWindow = new electron_1.BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1024,
+        height: 768,
+        minWidth: 800,
+        minHeight: 600,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
             nodeIntegration: false,
         },
     });
+    mainWindow.setTitle(appTitle);
     const startUrl = process.env['ELECTRON_START_URL'] ||
         `file://${path.join(__dirname, '../dist/index.html')}`;
     mainWindow.loadURL(startUrl);

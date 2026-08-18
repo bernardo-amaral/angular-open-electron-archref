@@ -1,18 +1,26 @@
 import { BrowserWindow, app, ipcMain } from 'electron';
 import * as path from 'path';
+import * as pkg from '../package.json';
 
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow(): void {
+  const version = (pkg as any).version || '0.0.0';
+  const appTitle = `NightShade's Music Player - ${version}`;
+
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1024,
+    height: 768,
+    minWidth: 800,
+    minHeight: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
   });
+
+  mainWindow.setTitle(appTitle);
 
   const startUrl =
     process.env['ELECTRON_START_URL'] ||
