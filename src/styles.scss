@@ -1,5 +1,13 @@
 @import "@angular/material/prebuilt-themes/indigo-pink.css";
 
+.mat-mdc-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
 * {
   box-sizing: border-box;
 }

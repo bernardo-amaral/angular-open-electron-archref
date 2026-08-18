@@ -1,85 +1,244 @@
-<div class="player-shell">
-  <aside class="library-panel">
-    <div class="brand">
-      <span class="brand-mark">M</span>
-      <div>
-        <strong>Music Kiosk</strong>
-        <small>Player</small>
+<div class="app-shell">
+  <div class="app-body">
+    <aside class="sidebar">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Buscar" [(ngModel)]="searchTerm" />
+      </mat-form-field>
+
+      <nav class="nav-group">
+        <p class="nav-title">Biblioteca</p>
+        <button
+          matRipple
+          class="nav-item"
+          [class.active]="view === 'artists'"
+          type="button"
+          (click)="goToArtists()"
+        >
+          <mat-icon>people</mat-icon>
+          <span>Artistas</span>
+        </button>
+        <button
+          matRipple
+          class="nav-item"
+          [class.active]="view === 'albums' || view === 'tracks'"
+          type="button"
+        >
+          <mat-icon>album</mat-icon>
+          <span>Álbuns</span>
+        </button>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <div class="window-chrome">
+        <button
+          mat-icon-button
+          aria-label="Voltar"
+          (click)="goBack()"
+          [disabled]="view === 'artists'"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-icon-button aria-label="Avançar" disabled>
+          <mat-icon>chevron_right</mat-icon>
+        </button>
       </div>
-    </div>
 
-    <div class="library-header">
-      <span>Playlist</span>
-      <button mat-icon-button aria-label="Adicionar música">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
-
-    <div class="playlist">
-      <button
-        matRipple
-        class="playlist-item active"
-        *ngFor="let track of playlist; let i = index"
-        type="button"
-      >
-        <span class="track-index">{{ i + 1 }}</span>
-        <span class="track-name">{{ track }}</span>
-      </button>
-    </div>
-  </aside>
-
-  <main class="player-panel">
-    <mat-card class="now-playing-card">
-      <div class="cover-wrap">
-        <img [src]="currentTrack.cover" [alt]="currentTrack.title" />
-      </div>
-
-      <div class="meta">
-        <p class="eyebrow">Now playing</p>
-        <h1>{{ currentTrack.title }}</h1>
-        <h2>{{ currentTrack.artist }}</h2>
-        <p class="album">{{ currentTrack.album }}</p>
-      </div>
-
-      <div class="progress-block">
-        <div class="time-row">
-          <span>{{ currentTrack.currentTime | number: "2.0" }}</span>
-          <span>{{ currentTrack.duration | number: "2.0" }}</span>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>{{ sectionTitle }}</h1>
+          <span class="count">{{ sectionCount }}</span>
         </div>
 
-        <mat-slider min="0" max="246" step="1" aria-label="Progression">
-          <input matSliderThumb [value]="currentTrack.currentTime" />
-        </mat-slider>
+        <div class="toolbar">
+          <button
+            mat-icon-button
+            [class.active]="layout === 'grid'"
+            aria-label="Visualização em grade"
+            (click)="setLayout('grid')"
+          >
+            <mat-icon>grid_view</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            [class.active]="layout === 'list'"
+            aria-label="Visualização em lista"
+            (click)="setLayout('list')"
+          >
+            <mat-icon>view_list</mat-icon>
+          </button>
+          <button mat-icon-button aria-label="Ordenar" (click)="toggleSort()">
+            <mat-icon>{{
+              sortAscending ? "arrow_upward" : "arrow_downward"
+            }}</mat-icon>
+          </button>
+        </div>
+      </header>
+
+      <!-- Nível 1: Artistas -->
+      <div
+        class="grid-list"
+        *ngIf="view === 'artists'"
+        [class.list-mode]="layout === 'list'"
+      >
+        <button
+          matRipple
+          class="card artist-card"
+          *ngFor="let artist of filteredArtists"
+          type="button"
+          (click)="selectArtist(artist)"
+        >
+          <span class="cover round">
+            <img [src]="artist.cover" [alt]="artist.name" />
+          </span>
+          <span class="card-title">{{ artist.name }}</span>
+        </button>
       </div>
 
-      <div class="controls">
+      <!-- Nível 2: Álbuns -->
+      <div
+        class="grid-list"
+        *ngIf="view === 'albums'"
+        [class.list-mode]="layout === 'list'"
+      >
         <button
-          mat-fab
-          color="primary"
+          matRipple
+          class="card album-card"
+          *ngFor="let album of selectedArtist?.albums"
+          type="button"
+          (click)="selectAlbum(album)"
+        >
+          <span class="cover square">
+            <img [src]="album.cover" [alt]="album.title" />
+          </span>
+          <span class="card-title">{{ album.title }}</span>
+          <span class="card-subtitle">{{ album.tracks.length }} música(s)</span>
+        </button>
+      </div>
+
+      <!-- Nível 3: Músicas -->
+      <div class="track-list" *ngIf="view === 'tracks'">
+        <button
+          matRipple
+          class="track-row"
+          [class.active]="isCurrentTrack(track)"
+          *ngFor="let track of selectedAlbum?.tracks; let i = index"
+          type="button"
+          (click)="playTrack(track)"
+        >
+          <span class="track-index">
+            <mat-icon *ngIf="isCurrentTrack(track) && isPlaying"
+              >graphic_eq</mat-icon
+            >
+            <ng-container *ngIf="!(isCurrentTrack(track) && isPlaying)">{{
+              i + 1
+            }}</ng-container>
+          </span>
+          <span class="track-title">{{ track.title }}</span>
+          <span class="track-duration">{{
+            track.duration | number: "2.0"
+          }}</span>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <footer class="player-bar">
+    <div class="now-playing" *ngIf="currentTrack; else noTrack">
+      <img
+        class="mini-cover"
+        [src]="currentTrack.cover"
+        [alt]="currentTrack.title"
+      />
+      <div class="now-playing-meta">
+        <span class="now-title">{{ currentTrack.title }}</span>
+        <span class="now-artist">{{ currentTrack.artist }}</span>
+      </div>
+    </div>
+    <ng-template #noTrack>
+      <div class="now-playing empty">
+        <div class="mini-cover placeholder">
+          <mat-icon>music_note</mat-icon>
+        </div>
+        <div class="now-playing-meta">
+          <span class="now-title">Nenhuma música selecionada</span>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="transport">
+      <div class="transport-buttons">
+        <button
+          mat-icon-button
+          [class.active]="shuffle"
+          aria-label="Aleatório"
+          (click)="toggleShuffle()"
+        >
+          <mat-icon>shuffle</mat-icon>
+        </button>
+        <button
+          mat-icon-button
           aria-label="Música anterior"
           (click)="previous()"
         >
-          <mat-icon>skip_previous</mat-icon>
+          <mat-icon>fast_rewind</mat-icon>
         </button>
-
         <button
-          mat-fab
+          mat-mini-fab
           class="play-button"
           aria-label="Reproduzir ou pausar"
           (click)="togglePlay()"
         >
           <mat-icon>{{ isPlaying ? "pause" : "play_arrow" }}</mat-icon>
         </button>
-
+        <button mat-icon-button aria-label="Próxima música" (click)="next()">
+          <mat-icon>fast_forward</mat-icon>
+        </button>
         <button
-          mat-fab
-          color="primary"
-          aria-label="Próxima música"
-          (click)="next()"
+          mat-icon-button
+          [class.active]="repeat"
+          aria-label="Repetir"
+          (click)="toggleRepeat()"
         >
-          <mat-icon>skip_next</mat-icon>
+          <mat-icon>repeat</mat-icon>
         </button>
       </div>
-    </mat-card>
-  </main>
+
+      <div class="progress-row">
+        <span class="time">{{ currentTime | number: "2.0" }}</span>
+        <mat-slider
+          class="progress-slider"
+          min="0"
+          [max]="currentTrack?.duration ?? 0"
+          step="1"
+          aria-label="Progressão"
+        >
+          <input matSliderThumb [value]="currentTime" />
+        </mat-slider>
+        <span class="time">{{
+          currentTrack?.duration ?? 0 | number: "2.0"
+        }}</span>
+      </div>
+    </div>
+
+    <div class="side-controls">
+      <button mat-icon-button aria-label="Tela cheia">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Fila de reprodução">
+        <mat-icon>queue_music</mat-icon>
+      </button>
+      <mat-icon class="volume-icon">volume_up</mat-icon>
+      <mat-slider
+        class="volume-slider"
+        min="0"
+        max="100"
+        step="1"
+        aria-label="Volume"
+      >
+        <input matSliderThumb [value]="volume" />
+      </mat-slider>
+    </div>
+  </footer>
 </div>
