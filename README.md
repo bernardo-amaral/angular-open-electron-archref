@@ -1,66 +1,66 @@
 # NightShade's Music Player
 
-Um aplicativo moderno de reprodução de música construído com Angular e Electron, com interface responsiva otimizada para desktops e para operação em modo kiosk.
+A modern music player application built with Angular and Electron, featuring a responsive interface optimized for desktops and kiosk-mode operation.
 
-## Sumário
+## Table of contents
 
-- [Visão geral](#visão-geral)
-- [Stack tecnológica](#stack-tecnológica)
-- [Requisitos](#requisitos)
-- [Instalação](#instalação)
-- [Executar em desenvolvimento](#executar-em-desenvolvimento)
-- [Build para produção](#build-para-produção)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Scripts disponíveis](#scripts-disponíveis)
-- [Características](#características)
-- [Configurações Electron](#configurações-electron)
-- [Desenvolvimento](#desenvolvimento)
+- [Overview](#overview)
+- [Tech stack](#tech-stack)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Running in development](#running-in-development)
+- [Production build](#production-build)
+- [Project structure](#project-structure)
+- [Available scripts](#available-scripts)
+- [Features](#features)
+- [Electron configuration](#electron-configuration)
+- [Development](#development)
 - [Troubleshooting](#troubleshooting)
-- [Implantação em Linux (Kiosk)](#implantação-em-linux-kiosk)
-- [Próximos passos](#próximos-passos)
+- [Linux deployment (Kiosk)](#linux-deployment-kiosk)
+- [Roadmap](#roadmap)
 
-## Visão geral
+## Overview
 
-O projeto é um player de música elegante, organizado pela hierarquia **Artista → Álbum → Músicas**, com:
+The project is an elegant music player, organized around the **Artist → Album → Tracks** hierarchy, featuring:
 
-- **Frontend** em Angular com componentes standalone
-- **Design responsivo** otimizado para resolução 1024x768
-- **Angular Material** para componentes de UI de alta qualidade
-- **Electron** para execução como aplicativo desktop nativo
-- **TypeScript** e **SCSS** para tipagem segura e estilos escaláveis
-- **Material Icons** para controles intuitivos do player
+- **Frontend** built with Angular standalone components
+- **Responsive design** optimized for 1024x768 resolution
+- **Angular Material** for high-quality UI components
+- **Electron** for running as a native desktop application
+- **TypeScript** and **SCSS** for type safety and scalable styling
+- **Material Icons** for intuitive player controls
 
-## Stack tecnológica
+## Tech stack
 
-| Camada                      | Tecnologia                          |
-| --------------------------- | ----------------------------------- |
-| Framework                   | Angular (componentes standalone)    |
-| UI                          | Angular Material (tema Indigo/Pink) |
-| Desktop runtime             | Electron                            |
-| Linguagem                   | TypeScript                          |
-| Estilos                     | SCSS                                |
-| Servidor de desenvolvimento | Express                             |
+| Layer              | Technology                           |
+| ------------------ | ------------------------------------ |
+| Framework          | Angular (standalone components)      |
+| UI                 | Angular Material (Indigo/Pink theme) |
+| Desktop runtime    | Electron                             |
+| Language           | TypeScript                           |
+| Styling            | SCSS                                 |
+| Development server | Express                              |
 
-## Requisitos
+## Requirements
 
 - **Node.js 22.13.1+**
 - **npm 12.0.2+**
 
-## Instalação
+## Installation
 
 ```bash
 npm install
 ```
 
-## Executar em desenvolvimento
+## Running in development
 
-**Web (navegador):**
+**Web (browser):**
 
 ```bash
 npm start
 ```
 
-A aplicação fica disponível em `http://localhost:4200/`.
+The app is available at `http://localhost:4200/`.
 
 **Desktop (Electron):**
 
@@ -68,9 +68,9 @@ A aplicação fica disponível em `http://localhost:4200/`.
 npm run electron:dev
 ```
 
-Sobe o Angular em modo dev e abre a janela do Electron carregando o mesmo servidor, com a resolução padrão de 1024x768.
+Starts Angular in dev mode and opens the Electron window pointing to the same dev server, at the default 1024x768 resolution.
 
-## Build para produção
+## Production build
 
 **Web:**
 
@@ -78,7 +78,7 @@ Sobe o Angular em modo dev e abre a janela do Electron carregando o mesmo servid
 npm run build
 ```
 
-Os artefatos gerados ficam na pasta `dist/kiosk-music-player`.
+The generated artifacts are placed in the `dist/kiosk-music-player` folder.
 
 **Desktop:**
 
@@ -86,9 +86,9 @@ Os artefatos gerados ficam na pasta `dist/kiosk-music-player`.
 npm run electron:build
 ```
 
-Gera o executável do aplicativo desktop via `electron-builder`.
+Builds the desktop executable via `electron-builder`.
 
-## Estrutura do projeto
+## Project structure
 
 ```
 .
@@ -105,7 +105,7 @@ Gera o executável do aplicativo desktop via `electron-builder`.
 │   ├── main.ts
 │   └── styles.scss
 ├── electron/
-│   ├── main.ts        # configuração de janela 1024x768
+│   ├── main.ts        # 1024x768 window configuration
 │   └── preload.ts
 ├── public/
 ├── angular.json
@@ -114,124 +114,124 @@ Gera o executável do aplicativo desktop via `electron-builder`.
 └── README.md
 ```
 
-## Scripts disponíveis
+## Available scripts
 
-| Script                        | Descrição                                              |
-| ----------------------------- | ------------------------------------------------------ |
-| `npm start`                   | Inicia o dev server Angular na porta 4200              |
-| `npm run build`               | Gera build de produção                                 |
-| `npm run watch`               | Build em modo watch                                    |
-| `npm test`                    | Executa testes com Karma/Jasmine                       |
-| `npm run electron:dev`        | Inicia Angular + Electron simultaneamente              |
-| `npm run electron:build`      | Cria o executável do app desktop                       |
-| `npm run electron:build-main` | Compila o TypeScript do processo principal do Electron |
+| Script                        | Description                                   |
+| ----------------------------- | --------------------------------------------- |
+| `npm start`                   | Starts the Angular dev server on port 4200    |
+| `npm run build`               | Generates a production build                  |
+| `npm run watch`               | Build in watch mode                           |
+| `npm test`                    | Runs tests with Karma/Jasmine                 |
+| `npm run electron:dev`        | Starts Angular and Electron simultaneously    |
+| `npm run electron:build`      | Builds the desktop app executable             |
+| `npm run electron:build-main` | Compiles the Electron main process TypeScript |
 
-## Características
+## Features
 
-- ✨ **Design responsivo** — interface fluida com percentuais de dimensão para adaptar-se a diferentes resoluções
-- 🎵 **Navegação por biblioteca** — hierarquia Artista → Álbum → Músicas, sem necessidade de gerenciar playlists
-- 🎨 **Tema personalizado** — paleta purple/pink com gradientes modernos
-- 📱 **Resolução otimizada** — dimensão mínima de 800x600, padrão 1024x768
-- 🚀 **Desktop nativo** — empacotável como aplicativo Electron para macOS, Windows e Linux
+- ✨ **Responsive design** — fluid interface using percentage-based dimensions to adapt to different resolutions
+- 🎵 **Library navigation** — Artist → Album → Tracks hierarchy, with no need to manage playlists
+- 🎨 **Custom theme** — purple/pink palette with modern gradients
+- 📱 **Optimized resolution** — minimum size of 800x600, default 1024x768
+- 🚀 **Native desktop** — packageable as an Electron app for macOS, Windows, and Linux
 
-## Configurações Electron
+## Electron configuration
 
-A janela do Electron é configurada com:
+The Electron window is configured with:
 
-- **Resolução padrão**: 1024x768
-- **Resolução mínima**: 800x600
-- **Título dinâmico**: `NightShade's Music Player - {versão}`
-- **Context isolation** e demais práticas de segurança habilitadas
+- **Default resolution**: 1024x768
+- **Minimum resolution**: 800x600
+- **Dynamic title**: `NightShade's Music Player - {version}`
+- **Context isolation** and other security best practices enabled
 
-## Desenvolvimento
+## Development
 
-### Adicionar novos componentes
+### Adding new components
 
 ```bash
-ng generate component components/novo-componente
+ng generate component components/new-component
 ```
 
-### Estilos
+### Styles
 
-Os estilos usam SCSS com um design system baseado em percentuais para responsividade:
+Styles use SCSS with a percentage-based design system for responsiveness:
 
-- Cores neutras e gradientes modernos
-- Tipografia com Inter e Segoe UI
-- Grid layout com media queries para telas menores
+- Neutral colors and modern gradients
+- Typography with Inter and Segoe UI
+- Grid layout with media queries for smaller screens
 
-### Ícones
+### Icons
 
-Os ícones do Material são importados automaticamente. Uso:
+Material icons are imported automatically. Usage:
 
 ```html
-<mat-icon>icone_name</mat-icon>
+<mat-icon>icon_name</mat-icon>
 ```
 
-Lista completa em [Material Symbols & Icons](https://fonts.google.com/icons).
+Full list available at [Material Symbols & Icons](https://fonts.google.com/icons).
 
 ## Troubleshooting
 
-**Ícones não aparecem?**
+**Icons not showing up?**
 
-- Verifique se a importação de Material Icons está presente em `src/index.html`
-- Limpe o cache do navegador
+- Check that the Material Icons import is present in `src/index.html`
+- Clear your browser cache
 
-**Erro de versão do Node?**
+**Node version error?**
 
 ```bash
 nvm install 22.13.1
 nvm use 22.13.1
 ```
 
-**`npm install` falha?**
+**`npm install` failing?**
 
 ```bash
 rm -rf node_modules package-lock.json
 npm install
 ```
 
-## Implantação em Linux (Kiosk)
+## Linux deployment (Kiosk)
 
-O projeto é otimizado para ser executado como um **kiosk de música** em uma imagem Linux dedicada, iniciando diretamente na interface da aplicação em vez do desktop do sistema.
+The project is optimized to run as a **music kiosk** on a dedicated Linux image, booting directly into the application interface instead of the system desktop.
 
-### Configuração de Kiosk
+### Kiosk setup
 
-1. **Instalação na máquina Linux**
+1. **Install on the Linux machine**
 
    ```bash
-   git clone <repositorio> kiosk-music-player
+   git clone <repository> kiosk-music-player
    cd kiosk-music-player
 
    npm install
    npm run electron:build
    ```
 
-2. **Autostart em modo kiosk**
-   - Configurar login automático e inicialização do Electron junto com a sessão gráfica (via `.desktop` autostart ou serviço `systemd`)
-   - Aplicativo executa na resolução configurada (ajustável)
-   - Interface otimizada para leitura à distância
+2. **Autostart in kiosk mode**
+   - Configure automatic login and Electron startup alongside the graphical session (via `.desktop` autostart or a `systemd` service)
+   - The app runs at the configured resolution (adjustable)
+   - Interface optimized for reading at a distance
 
-3. **Modo tela cheia**
-   - O Electron pode ser configurado com `fullscreen: true` e `kiosk: true`
-   - Oculta a barra de tarefas e os controles do sistema
+3. **Fullscreen mode**
+   - Electron can be configured with `fullscreen: true` and `kiosk: true`
+   - Hides the taskbar and system controls
 
-4. **Gerenciamento remoto** (roadmap)
-   - Atualizar a biblioteca musical via endpoint HTTP
-   - Sincronizar conteúdo entre instâncias
-   - Monitorar a saúde do aplicativo
+4. **Remote management** (roadmap)
+   - Update the music library via an HTTP endpoint
+   - Sync content across instances
+   - Monitor application health
 
-### Requisitos para Kiosk Linux
+### Requirements for Linux Kiosk
 
-- Linux com Xorg ou Wayland
+- Linux with Xorg or Wayland
 - Node.js 22.13.1+
-- ~500MB de espaço em disco
-- GPU com suporte a aceleração 2D/3D (recomendado)
+- ~500MB of disk space
+- GPU with 2D/3D acceleration support (recommended)
 
-## Próximos passos
+## Roadmap
 
-- Implementar reprodução real de áudio (Web Audio API / módulo nativo)
-- Varredura automática de diretório para popular a biblioteca (ex.: `D:/musicas`)
-- Histórico de reprodução e favoritos
-- Sincronização entre web e desktop
-- API REST para gerenciamento remoto de kiosk
-- Dashboard de monitoramento de instâncias
+- Implement real audio playback (Web Audio API / native module)
+- Automatic directory scanning to populate the library (e.g., `D:/music`)
+- Playback history and favorites
+- Sync between web and desktop
+- REST API for remote kiosk management
+- Instance monitoring dashboard
