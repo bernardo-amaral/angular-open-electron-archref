@@ -8,6 +8,7 @@
 /.angular
 /.vscode
 /dist-electron
+/release
 
 # Node
 /node_modules

@@ -1,22 +1,35 @@
-appId: com.bernardoamaral.app
-productName: Bernardo
+appId: com.nightshade.kioskmusicplayer
+productName: NightShade's Music Player
+
 directories:
   output: release
   buildResources: build
 
 files:
   - dist-electron/**/*
-  - dist/open-pdv/browser/**/*
+  - dist/kiosk-music-player/**/*
   - package.json
 
 extraMetadata:
   main: dist-electron/main.js
 
+asar: true
+
 win:
-  target: nsis
-  arch:
-    - x64
+  target:
+    - target: nsis
+      arch:
+        - x64
   artifactName: ${productName}-setup-${version}.${ext}
+
+linux:
+  target:
+    - target: deb
+      arch:
+        - armv7l
+  category: AudioVideo
+  executableName: nightshade-music-player
+  artifactName: ${productName}-${version}-${arch}.${ext}
 
 nsis:
   oneClick: false

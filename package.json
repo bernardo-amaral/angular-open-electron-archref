@@ -1,7 +1,13 @@
 {
   "name": "kiosk-music-player",
-  "version": "0.0.0",
+  "version": "0.0.2",
+  "description": "A modern music player built with Angular and Electron.",
   "main": "dist-electron/main.js",
+  "author": {
+    "name": "Bernardo Amaral",
+    "email": "noreply@sindigo.app.br"
+  },
+  "license": "MIT",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 4200",
@@ -11,7 +17,10 @@
     "electron:build-main": "tsc -p electron/tsconfig.json",
     "electron:dev": "concurrently -k -n ANGULAR,ELECTRON -c blue,magenta \"npm:start\" \"npm:electron:dev:launch\"",
     "electron:dev:launch": "npm run electron:build-main && wait-on http://localhost:4200 && cross-env ELECTRON_START_URL=http://localhost:4200 electron .",
-    "electron:build": "npm run build && npm run electron:build-main && electron-builder --config electron-builder.yml"
+    "electron:build": "npm run build && npm run electron:build-main && electron-builder --config electron-builder.yml",
+    "electron:build:armv7": "npm run build && npm run electron:build-main && electron-builder --linux --armv7l",
+    "electron:build:linux:arm64": "npm run build && npm run electron:build-main && electron-builder --linux deb --arm64 --config electron-builder.yml",
+    "electron:build:windows": "npm run build && npm run electron:build-main && electron-builder --win nsis --x64 --config electron-builder.yml"
   },
   "private": true,
   "packageManager": "npm@12.0.2",
